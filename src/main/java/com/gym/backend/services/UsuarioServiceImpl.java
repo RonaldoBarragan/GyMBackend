@@ -105,7 +105,7 @@ public class UsuarioServiceImpl implements UsuarioService {
         auth.setId(perfilGuardado.getId());
         dto.setUsuario(dto.getEmail());
         auth.setUsuario(dto.getEmail());
-        auth.setPass(passwordEncoder.encode(dto.getPassword()));
+        auth.setPassword(passwordEncoder.encode(dto.getPassword()));
         auth.setRoles(dto.getRoles());
         
         authRepo.save(auth);

@@ -15,7 +15,7 @@ public class UsuarioAuth {
     @Id
     private String id; // ID único para cada usuario el mismo del perfil
     private String usuario; // dato de usuario para autenticación
-    private String pass; // dato de contraseña para autenticación encriptada(bcrypt)
+    private String password; // dato de contraseña para autenticación encriptada(bcrypt)
 
     private List<Rol> roles; // lista de roles usando enum
 

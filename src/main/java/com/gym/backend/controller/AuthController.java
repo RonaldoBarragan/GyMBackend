@@ -35,42 +35,49 @@ public class AuthController {
         }
 
         @PostMapping("/login")
-        public ResponseEntity<Map<String, Object>> login(@RequestBody UsuarioAuthDto dto) {
+public ResponseEntity<?> login(@RequestBody UsuarioAuthDto dto) {
 
-                // Autentificacion (Spring Security Valida usuario y contraseña)
-                Authentication auth = authManager
-                                .authenticate(new UsernamePasswordAuthenticationToken(dto.getUsuario(),
-                                                dto.getPassword()));
+    try {
 
-                // consultar usuario en Dase de datos
-                UsuarioAuth usuario = uar.findByUsuario(dto.getUsuario())
-                                .orElseThrow(() -> new RuntimeException("Usuario no encontrado contro"));
+        Authentication auth = authManager.authenticate(
+                new UsernamePasswordAuthenticationToken(
+                        dto.getUsuario(),
+                        dto.getPassword()));
 
-                // extraer el nombre del usuario completo desde la colección de perfil usando el
-                // id del usuario auth
-                Usuario perfil = usuarioRepo.findById(usuario.getId())
-                                .orElseThrow(() -> new RuntimeException("Perfil no encontrado"));
-                // 3️⃣ EXTRAER ROLES (Enum → String)
-                List<String> roles = usuario.getRoles()
-                                .stream()
-                                .map(Enum::name)
-                                .toList();
+        UsuarioAuth usuario = uar.findByUsuario(dto.getUsuario())
+                .orElseThrow(() -> new RuntimeException("Usuario no encontrado contro"));
 
-                // 4️⃣ GENERAR TOKEN JWT
-                String token = jwtService.generarToken(usuario.getUsuario(), roles, perfil.getNom(), perfil.getDoc());
+        Usuario perfil = usuarioRepo.findById(usuario.getId())
+                .orElseThrow(() -> new RuntimeException("Perfil no encontrado"));
 
-                // 5️⃣ RESPUESTA (estándar tipo enterprise básica)
-                Map<String, Object> respuesta = Map.of(
-                                "timestamp", LocalDateTime.now(),
-                                "status", 200,
-                                "id", usuario.getId(),
-                                "mensaje", "Login exitoso",
-                                "usuario", usuario.getUsuario(),
-                                "nombre", perfil.getNom(),
-                                "numeroDocumento", perfil.getDoc(),
-                                "roles", roles,
-                                "token", token);
+        List<String> roles = usuario.getRoles()
+                .stream()
+                .map(Enum::name)
+                .toList();
 
-                return ResponseEntity.ok(respuesta);
-        }
+        String token = jwtService.generarToken(
+                usuario.getUsuario(),
+                roles,
+                perfil.getNom(),
+                perfil.getDoc());
+
+        Map<String, Object> respuesta = Map.of(
+                "token", token,
+                "nombre", perfil.getNom(),
+                "correo", usuario.getUsuario(),
+                "roles", roles
+        );
+
+        return ResponseEntity.ok(respuesta);
+
+    } catch (Exception e) {
+
+        e.printStackTrace();
+
+        return ResponseEntity.status(500)
+                .body(Map.of(
+                        "error", e.getMessage()
+                ));
+    }
+}
 }

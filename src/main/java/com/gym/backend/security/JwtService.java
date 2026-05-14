@@ -35,18 +35,22 @@ public class JwtService {
     }
 
     // Generar un token JWT
-    public String generarToken(String usuario, List<String> roles, String nom, Documento numero) {
-        return Jwts.builder()// Construye el token JWT
-                .setSubject(usuario)// Establece el sujeto del token (el usuario)
-                .claim("roles", roles)// Agrega los roles del usuario
-                .claim("nombre", nom)// Agrega el nombre del usuario
-                .claim("numero", numero)// Agrega el nombre del usuario
-                .setIssuedAt(new Date()) // Establece la fecha de emisión del token
-                .setExpiration(new Date(System.currentTimeMillis() + 3600000)) // expiración del token (1 hora)
-                // .setExpiration(new Date(System.currentTimeMillis() + 1000 * 60 * 60 *24))
-                .signWith(obtenerClave(), SignatureAlgorithm.HS256) // Firma el token con la clave secreta
-                .compact();
-    }
+    public String generarToken(
+        String usuario,
+        List<String> roles,
+        String nom,
+        Documento numero) {
+
+    return Jwts.builder()
+            .setSubject(usuario)
+            .claim("roles", roles)
+            .claim("nombre", nom)
+            .claim("numero", numero.getNumero())
+            .setIssuedAt(new Date())
+            .setExpiration(new Date(System.currentTimeMillis() + 3600000))
+            .signWith(obtenerClave(), SignatureAlgorithm.HS256)
+            .compact();
+}
 
     // extraer Datos del token tambien llamado claims // es el generico del token
     public Claims obtenerClaims(String token) {

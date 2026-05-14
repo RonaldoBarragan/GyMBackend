@@ -37,7 +37,7 @@ public class DetallesUsuarioService implements UserDetailsService {
 
         return User.builder()
                 .username(usuario.getUsuario()) // Establece el nombre de usuario
-                .password(usuario.getPass()) // Establece la contraseña (debería estar codificada)
+                .password(usuario.getPassword()) // Establece la contraseña (debería estar codificada)
                 .authorities(
                         usuario.getRoles().stream()
                                 .map(Enum::name)
